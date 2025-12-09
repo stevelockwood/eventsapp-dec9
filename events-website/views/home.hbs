@@ -1,0 +1,32 @@
+<div class="row">
+  {{#events}}
+  <div class="card" style="width: 20rem; margin:5px">
+    <div class="card-body">
+<div class="d-flex justify-content-between align-items-start">
+        <h2 class="card-title">{{ title }}</h2>
+        <a href="/event/delete/{{id}}" class="btn btn-danger"><span class="bi bi-trash"></span></a>
+      </div>
+
+      <p class="card-text">{{ description }}</p>
+      <p class="card-text">Location: {{ location }}</p>
+      <p class="card-text">Date and Time: {{ event_time }}</p>
+      <p class="card-text">Likes: {{ likes }}
+      <form method="POST" action="/like/event" style="display:inline">
+        <input type="hidden" value="{{id}}" name="id">
+        <button type="submit" class="btn btn-success">
+          <span class="bi bi-hand-thumbs-up"></span>
+        </button>
+      </form>
+      <form method="POST" action="/event/unlike" style="display:inline">
+        <input type="hidden" value="{{id}}" name="id">
+        <button type="submit" class="btn btn-warning">
+          <span class="bi bi-hand-thumbs-down"></span>
+        </button>
+      </form>
+      </p>
+
+      <a href="/event/{{id}}" class="btn btn-primary">View Event</a>
+    </div>
+  </div>
+  {{/events}}
+</div>
