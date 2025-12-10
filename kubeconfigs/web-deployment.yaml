@@ -7,7 +7,7 @@ spec:
     matchLabels:
       app: events-web
       ver: v1.0
-  replicas: 1 # tells deployment to run 1 pod matching the template
+  replicas: 3 # tells deployment to run 1 pod matching the template
   template:
     metadata:
       labels:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: events-web
-        image: your-docker-hub-id/events-website:v1.0
+        image: coursedemos/events-website-dec10:v1.0
         env: 
         - name: SERVER
           value: "http://events-api-service:8082"

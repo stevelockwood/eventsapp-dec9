@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-initializer
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: db-init-job
+        image: coursedemos/db-init-d5:v1.0
+        imagePullPolicy: "Always"
+        env:
+        - name: DBHOST
+          value: "database-server-mariadb"
+        - name: DBUSER
+          value: "root"
+        - name: DBPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-server-mariadb
+              key: mariadb-root-password

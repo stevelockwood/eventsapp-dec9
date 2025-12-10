@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: events-website
+spec:
+  containers:
+  - name: website
+    image: coursedemos/events-website-dec10:v1.0
+    ports:
+    - containerPort: 8080
+
