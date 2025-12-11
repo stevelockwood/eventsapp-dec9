@@ -1,59 +1,64 @@
 name: Deploy Events Website (ECR)
+
 on:
- push:
-  branches: [main]
+  push:
+    branches:
+      - main
+
 # *********************
 # TODO: Update the 3 variables below to match your region
 env:
- AWS_REGION: us-east-2
- EKS_CLUSTER_NAME: user501-eks-cluster
- ECR_REPOSITORY: user50/events-website
+  AWS_REGION: us-east-2
+  EKS_CLUSTER_NAME: user501-eks-cluster
+  ECR_REPOSITORY: user50/events-website
 
 jobs:
- build-and-deploy:
-  name: Build and Deploy Events Website
-  runs-on: ubuntu-latest
-  environment: production
- defaults:
-  run:
-   shell: bash
- steps:
- # Checkout the repository to the GitHub Actions runner
- - name: Checkout
-  uses: actions/checkout@v3
+  build-and-deploy:
+    name: Build and Deploy Events Website
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        shell: bash
 
-  Configure AWS credentials (needed for ECR login and EKS access)
- - name: Configure AWS credentials
-  uses: aws-actions/configure-aws-credentials@v1
-  with:
-   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-   aws-region: ${{ env.AWS_REGION }}
- # Login to Amazon ECR
- - name: Login to Amazon ECR
-  id: login-ecr
-  uses: aws-actions/amazon-ecr-login@v1
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v3
 
- # Build, tag, and push Docker image to Amazon ECR
- - name: Build, tag, and push image to Amazon ECR
-  env:
-   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-   IMAGE_TAG: ${{ github.sha }}
-   run: |
-    cd events-website
-    docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-    docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      # Configure AWS credentials (needed for ECR login and EKS access)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-  # Update kubeconfig for EKS
- - name: Update kubeconfig
-  run: |
-   aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
- # Deploy to EKS
- - name: Deploy to EKS
-  env:
-   ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-   IMAGE_TAG: ${{ github.sha }}
-   run: |
-     kubectl set image deployment/events-web events-web=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-     kubectl rollout status deployment/events-web
- 
+      # Login to Amazon ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Build, tag, and push Docker image to Amazon ECR
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd events-website
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+
+      # Update kubeconfig for EKS
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+
+      # Deploy to EKS
+      - name: Deploy to EKS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          kubectl set image deployment/events-web events-web=$ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          kubectl rollout status deployment/events-web
