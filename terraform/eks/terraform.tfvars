@@ -1,7 +1,7 @@
 project = "events-app"
 
-region = "us-east-2"
-username = "user501"
+region = "us-west-2"
+username = "user51"
 
 events-api-container = "coursedemos/events-api-dec10:v1.0"
 events-website-container = "coursedemos/events-website-dec10:v1.0"

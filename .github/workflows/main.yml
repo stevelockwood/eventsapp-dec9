@@ -8,8 +8,8 @@ on:
 # *********************
 # TODO: Update the 3 variables below to match your region
 env:
-  AWS_REGION: us-east-2
-  EKS_CLUSTER_NAME: user501-eks-cluster
+  AWS_REGION: us-west-2
+  EKS_CLUSTER_NAME: user51-eks-cluster
   ECR_REPOSITORY: user50/events-website
 
 jobs:
