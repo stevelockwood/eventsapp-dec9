@@ -4,7 +4,7 @@ resource "kubernetes_deployment" "events_web" {
     name = "events-web"
   }
   spec {
-    replicas = 1
+    replicas = 4
     selector {
       match_labels = {
         app = "events-web"
